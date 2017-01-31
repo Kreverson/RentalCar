@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html ng-app="store">
+<head>
+<link rel="stylesheet" type="text/css" href="Content/css/bootstrap.min.css"/>
+<link rel="stylesheet" type="text/css" href="Content/css/app.css"/>
+</head>
+
+<body ng-controller="StoreController as store">
+    <div class="row store">
+    <!--MENU ESQUERDO-->
+    <div class="col-lg-3 store-ct-left">
+        <form>
+            <div class="form-group">
+                <label for="inputLcRetirada">Local de retirada</label>
+                <input type="text" class="form-control simplebox" id="inputLcRetirada" value="São Paulo - São Paulo/BR, Brasil">
+            </div>
+            <div class="form-group group-changeLocal">
+                <div class="icocheck divicocheck"></div>
+                <input type="checkbox" id="ckbLocalDif"><label> Devolver o carro em outro local</label>
+            </div>
+            <div class="form-group">
+                <label for="inputLcDevolucao">Local de devolução</label>
+                <input type="text" class="form-control simplebox" id="inputLcDevolucao" value="Rio de Janeiro - Rio de Janeiro/BR, Brasil">
+            </div>
+            <div class="form-group controls-calendar">
+                <label for="inputDtRetira">Retirada</label>
+                <div class="input-calendar">
+                    <input type="text" class="form-control simplebox" id="inputDtRetira" value="10/11/2016">
+                    <div class="icocalendar calendar-separator"></div>
+                    <select class="form-control simplebox" id="inputHrRetira">
+                        <option>08:00</option>
+                        <option>09:00</option>
+                        <option>10:00</option>
+                        <option>11:00</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group controls-calendar">
+                <label for="inputDtDevolucao">Devolução - 8 dia(s)</label>
+                <div class="input-calendar">
+                    <input type="text" class="form-control simplebox" id="inputDtDevolucao" value="10/11/2017">
+                    <div class="icocalendar calendar-separator"></div>
+                    <select class="form-control simplebox" id="inputHrDevoluao">
+                        <option>08:00</option>
+                        <option>09:00</option>
+                        <option>10:00</option>
+                        <option>11:00</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <div class="panel-promotion">
+                    <div class="panel-head">
+                        <label>Economize até 30%</label>
+                    </div>
+                    <div class="panel-body">
+                        <ul>
+                            <li><input type="checkbox" />Incluir voo</li>
+                            <li><input type="checkbox" />Incluir hotel</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="icobuscar"></div>
+            </div>
+        </form>
+    </div>
+    <!--/MENU ESQUERDO-->
+    <!--CONTAINER DIREITO-->
+    <div class="col-lg-8 store-ct-righ" ng-controller="StoreController as store">
+        <!--FILTROS-->
+        <div class="row store-filters">
+            <div class="col">
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label>Itens por página:</label>
+                        <select class="form-control simplebox"  ng-model="filterItemsPerPageSelected"  ng-options="filterItemPerPage.id as filterItemPerPage.name for filterItemPerPage in filterItensPerPage"  ng-change="setItemsPerPage(filterItemsPerPageSelected)">                
+                        <option value="">Selecione</option>
+                        </select>
+                        
+                    </div>
+                    <div class="form-group">
+                        <label>Ordernar por:</label>
+                        <select class="form-control simplebox"  ng-model="filterpriceSelected"  ng-options="filterprice.id as filterprice.name for filterprice in filterprices"  ng-change="orderProductsByPrice(filterpriceSelected)">                
+                        <option value="">Selecione</option>
+                        </select>
+                        
+                    </div>
+                    <div class="form-group">
+                        <label>Moeda:</label>
+                        <select class="form-control simplebox">
+                            <option>Real</option>
+                            <option>Dólar</option>
+                            <option>Euro</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/FILTROS-->
+        <!--PRODUTOS-->
+        <div class="row store-products" dir-paginate="product in store.products | sort:'price' |itemsPerPage:itemsPerPage">
+            <div class="col-lg-10 product">
+                <div class="row">
+                    <!--{{#if product.discount}}-->
+                    <div class="tag-discount">
+                        <p>Desconto</p>
+                        <p>{{product.discount}}%</p>
+                    </div>
+                    <!--{{/if}}-->
+                    <div class="product-favorite">
+                        <div class="favorite-{{product.isFavorite}}" {{action "setFavorite" product on="click" }}></div>
+                    </div>
+                    <div class="col-md-4 product-image">
+
+                        <img ng-src="{{product.urlImage}}" />
+                    </div>
+                    <div class="col-md-6 product-description">
+                        <p class="product-name">{{product.name}}</p>
+                        <div>
+                            <ul>
+                                <li><label class="text-uppercase">Código da taxa:</label> {{product.taxcode}}</li>
+                                <li class="text-uppercase">{{product.vehicles}}</li>
+                            </ul>
+                        </div>
+                        <ul ng-repeat="description in product.description">
+                            <li>{{description}}</li>
+                        </ul>
+                        <div class="product-details" {{action "setToggleHasDetail" product}}>
+                            <div class="details-true" ng-if="detail == product.hasDetail">
+                                <p>Ver detalhes -</p>
+                                <div class="icodetails"></div>
+                            </div>
+                            <div class="details-true" ng-if="detail != product.hasDetail">
+                                <p>Ver detalhes +</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row product-details-text details-true" ng-if="serialItens == product.hasDetail">
+                    {{product.details}}
+                </div>
+                <div class="row product-serialItens">
+                    <div class="col-md-12">
+                        <ul ng-repeat="item in product.serialItens">
+                            <li><div class="{{item.iconName}}"></div>{{item.name}}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 product-price">
+                <div class="product-price-description">
+                    <p class="price-title ">Total da Locação</p>
+                    <div ng-if="product.discount != 0">
+                    <p class="price-txt">de R$ {{product.price}}</p>
+                    <p class="price-txt">por <label class="price-txt-blue">R$ <label class="price-value">{{product.pricePromotion}}</label></label></p>
+                    </div>
+                    <div <div ng-if="product.discount == 0">
+                    <p class="price-txt"><label class="price-txt-blue">R$ <label class="price-value">{{product.price}}</label></label></p>
+                    </div>
+                    <p class="price-txt"><label class="price-txt-blue">em até 10x</label> </p>
+                </div>
+                <div class="btn-product">
+                    <div class="product-btn-rent"></div>
+                </div>
+                <div class="price-info">
+                    Taxas inclusas
+                </div>
+            </div>
+        </div>
+        <!--/PRODUTOS-->
+        <!--PAGINAÇÃO-->
+        <div class="row produts-pagination">
+            <dir-pagination-controls max-size="5" boundary-links="true" ></dir-pagination-controls>
+        </div>
+        <!--/PAGINAÇÃO-->
+    </div>
+    <!--/CONTAINER DIREITO-->
+</div>
+
+<script src="Scripts/angular.js"></script>
+<script type="text/javascript" src="Scripts/app.js"></script>
+<script type="text/javascript" src="Scripts/dirPagination.js"></script>
+</body>
+</html>
